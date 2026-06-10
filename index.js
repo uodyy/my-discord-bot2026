@@ -1,4 +1,3 @@
-require('dotenv').config();
 const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
 
@@ -10,6 +9,9 @@ const client = new Client({
         GatewayIntentBits.GuildVoiceStates
     ] 
 });
+
+// ضع التوكن الخاص بك هنا بين علامتي التنصيص
+const TOKEN = "MTUxNDM3MjYyNzk2MjI2NTY5MA.GKoSBG.aSfZf_kqZy1DdAZCVl1_5m6-Nmsa4CPIo_Dbic";
 
 client.on('ready', () => {
     console.log(`✅ البوت متصل بنجاح: ${client.user.tag}`);
@@ -28,16 +30,22 @@ client.on('messageCreate', async (message) => {
         const [guildId, channelId] = args;
         const guild = client.guilds.cache.get(guildId);
         if (guild) {
-            joinVoiceChannel({
-                channelId: channelId,
-                guildId: guildId,
-                adapterCreator: guild.voiceAdapterCreator,
-            });
-            message.reply("✅ تم الاتصال بالروم!");
+            try {
+                joinVoiceChannel({
+                    channelId: channelId,
+                    guildId: guildId,
+                    adapterCreator: guild.voiceAdapterCreator,
+                });
+                message.reply("✅ تم الاتصال بالروم!");
+            } catch (error) {
+                message.reply("❌ حدث خطأ أثناء الاتصال بالروم.");
+            }
         } else {
             message.reply("❌ لم أجد السيرفر.");
         }
     }
 });
 
-client.login(process.env.TOKEN);
+client.login(TOKEN).catch(err => {
+    console.error("❌ فشل تسجيل الدخول. تأكد أن التوكن صحيح!");
+});
