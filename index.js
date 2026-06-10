@@ -1,69 +1,59 @@
-const { Client } = require('discord.js-selfbot-v13');
+const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
-const client = new Client();
 
-const APP_ID = "1514372627962265690";
-let isPaused = false;
+const client = new Client({ 
+    intents: [
+        GatewayIntentBits.Guilds, 
+        GatewayIntentBits.GuildMessages, 
+        GatewayIntentBits.MessageContent, 
+        GatewayIntentBits.GuildVoiceStates
+    ] 
+});
 
-// --- دالة الستريم المدمجة ---
-const setStreaming = () => {
-    client.user.setPresence({
-        status: 'online',
-        activities: [{
-            name: "Eyad's Stream",
-            type: "STREAMING",
-            url: "https://www.twitch.tv/twitch",
-            applicationId: APP_ID,
-            assets: { largeImage: "stream_logo", largeText: "Eyad's Stream" },
-            buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
-        }]
+// ضع هنا التوكن الجديد الذي حصلت عليه بعد الـ Reset
+const TOKEN = "MTUxNDM3MjYyNzk2MjI2NTY5MA.GzV-Qp.EFk4juPsIDD9zLSNkw9--GfJLNetuHBEZLIthA"; 
+
+client.on('ready', () => {
+    console.log(`✅ البوت جاهز ويعمل باسم: ${client.user.tag}`);
+    
+    // تعيين حالة الستريم (تظهر للبوتات كـ Streaming)
+    client.user.setActivity("Eyad's Stream", {
+        type: ActivityType.Streaming,
+        url: "https://www.twitch.tv/twitch"
     });
-};
+});
 
-// --- نظام الأوامر (Slash-like) ---
 client.on('messageCreate', async (message) => {
-    if (message.author.id !== client.user.id) return; // البوت يستجيب لك فقط
-
+    if (!message.content.startsWith('/')) return;
+    
     const args = message.content.slice(1).split(' ');
     const command = args.shift().toLowerCase();
 
-    // /room <guildId> <channelId>
+    // أمر /room <guildId> <channelId>
     if (command === 'room') {
         const [guildId, channelId] = args;
-        const guild = await client.guilds.fetch(guildId).catch(() => null);
+        const guild = client.guilds.cache.get(guildId);
         if (guild) {
-            joinVoiceChannel({ channelId, guildId, adapterCreator: guild.voiceAdapterCreator });
-            message.reply(`✅ تم الاتصال بالروم: ${channelId}`);
-        } else message.reply("❌ تعذر العثور على السيرفر.");
-    }
-
-    // /restart
-    if (command === 'restart') {
-        message.reply("🔄 إعادة تشغيل البوت...");
-        process.exit(); // سيعيد تشغيله تلقائياً إذا كنت تستخدم PM2
-    }
-
-    // /stream
-    if (command === 'stream') {
-        setStreaming();
-        message.reply("📺 تم تفعيل الستريم.");
-    }
-});
-
-client.on('ready', () => {
-    console.log(`تم التشغيل كـ: ${client.user.tag}`);
-    setStreaming();
-});
-
-// --- الأوتو كويست ---
-client.on('messageCreate', async (message) => {
-    if (message.author.system && message.components.length > 0) {
-        const button = message.components[0].components.find(c => c.type === 2);
-        if (button && message.content.toLowerCase().includes('quest')) {
-            const appId = button.url ? new URL(button.url).searchParams.get('application_id') : "0";
-            await message.clickButton(button.customId).catch(() => {});
+            try {
+                joinVoiceChannel({
+                    channelId: channelId,
+                    guildId: guildId,
+                    adapterCreator: guild.voiceAdapterCreator,
+                });
+                message.reply("✅ تم الاتصال بالروم بنجاح!");
+            } catch (error) {
+                message.reply("❌ حدث خطأ أثناء الاتصال بالروم.");
+            }
+        } else {
+            message.reply("❌ لم أجد السيرفر، تأكد من الـ ID.");
         }
     }
+
+    // أمر /restart
+    if (command === 'restart') {
+        await message.reply("🔄 جاري إعادة التشغيل...");
+        process.exit(); 
+    }
 });
 
-client.login(process.env.TOKEN);
+client.login(TOKEN);
