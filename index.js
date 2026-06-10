@@ -9,14 +9,12 @@ const APP_ID = "1513361397327593562";
 
 client.on('rateLimit', (info) => {
     isPaused = true;
-    console.log(`⚠️ نظام الحماية مفعل! توقف لمدة ${Math.round(info.timeout / 1000)} ثانية.`);
     setTimeout(() => { isPaused = false; }, info.timeout + 1000);
 });
 
-// دالة الـ Streaming المحدثة بالطريقة التي تقبلها سيرفرات ديسكورد حالياً
-const updateStreaming = () => {
+// دالة فرض حالة الستريم الوحيدة
+const setOnlyStreaming = () => {
     if (isPaused) return;
-
     client.user.setPresence({
         status: 'online',
         activities: [{
@@ -24,7 +22,6 @@ const updateStreaming = () => {
             type: "STREAMING",
             url: "https://www.twitch.tv/twitch",
             applicationId: APP_ID,
-            details: "Eyad's Stream",
             assets: {
                 largeImage: "mp:external/1344473859664539668/https/i.imgur.com/83pZpGZ.png",
                 largeText: "Eyad's Stream"
@@ -32,7 +29,6 @@ const updateStreaming = () => {
             buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
         }]
     });
-    console.log("تم تحديث حالة الـ Streaming بنجاح.");
 };
 
 async function connectToVoice() {
@@ -50,12 +46,11 @@ async function connectToVoice() {
 
 client.on('ready', async () => {
     console.log(`تم التشغيل كـ: ${client.user.tag}`);
-    
-    // تشغيل الستات فوراً
-    updateStreaming();
-    
-    // اتصال الصوت
     await connectToVoice();
+    
+    // تشغيل الستريم فوراً وتكراره كل 10 دقائق للتأكيد
+    setOnlyStreaming();
+    setInterval(setOnlyStreaming, 600000);
 });
 
 // نظام السبام
