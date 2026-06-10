@@ -5,7 +5,6 @@ const client = new Client();
 const messages = ["منورين السيرفر يا شباب! ✨", "سيرفر سام هو الأفضل دائماً 🏎️", "العمل المستمر هو سر النجاح! 🚀"];
 let isPaused = false;
 
-// إعدادات الـ Streaming
 const APP_ID = "1513361397327593562";
 
 client.on('rateLimit', (info) => {
@@ -14,21 +13,26 @@ client.on('rateLimit', (info) => {
     setTimeout(() => { isPaused = false; }, info.timeout + 1000);
 });
 
-// دالة الـ Streaming (تم تحسينها للظهور الإجباري)
+// دالة الـ Streaming المحدثة بالطريقة التي تقبلها سيرفرات ديسكورد حالياً
 const updateStreaming = () => {
     if (isPaused) return;
-    client.user.setActivity({
-        name: "Eyad's Stream",
-        type: "STREAMING",
-        url: "https://www.twitch.tv/twitch",
-        applicationId: APP_ID,
-        assets: {
-            large_image: "mp:external/1344473859664539668/https/i.imgur.com/83pZpGZ.png",
-            large_text: "Eyad's Stream"
-        },
-        buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
+
+    client.user.setPresence({
+        status: 'online',
+        activities: [{
+            name: "Eyad's Stream",
+            type: "STREAMING",
+            url: "https://www.twitch.tv/twitch",
+            applicationId: APP_ID,
+            details: "Eyad's Stream",
+            assets: {
+                largeImage: "mp:external/1344473859664539668/https/i.imgur.com/83pZpGZ.png",
+                largeText: "Eyad's Stream"
+            },
+            buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
+        }]
     });
-    console.log("تم تحديث حالة الـ Streaming.");
+    console.log("تم تحديث حالة الـ Streaming بنجاح.");
 };
 
 async function connectToVoice() {
@@ -47,9 +51,8 @@ async function connectToVoice() {
 client.on('ready', async () => {
     console.log(`تم التشغيل كـ: ${client.user.tag}`);
     
-    // تشغيل الستات فوراً ثم بعد 10 ثواني لضمان ثباتها
+    // تشغيل الستات فوراً
     updateStreaming();
-    setTimeout(updateStreaming, 10000);
     
     // اتصال الصوت
     await connectToVoice();
