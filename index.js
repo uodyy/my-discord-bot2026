@@ -2,19 +2,11 @@ const { Client } = require('discord.js-selfbot-v13');
 const { joinVoiceChannel } = require('@discordjs/voice');
 const client = new Client();
 
-const messages = ["منورين السيرفر يا شباب! ✨", "سيرفر سام هو الأفضل دائماً 🏎️", "العمل المستمر هو سر النجاح! 🚀"];
+const APP_ID = "1514372627962265690";
 let isPaused = false;
 
-const APP_ID = "1513361397327593562";
-
-client.on('rateLimit', (info) => {
-    isPaused = true;
-    setTimeout(() => { isPaused = false; }, info.timeout + 1000);
-});
-
-// دالة فرض حالة الستريم الوحيدة
-const setOnlyStreaming = () => {
-    if (isPaused) return;
+// --- دالة الستريم المدمجة ---
+const setStreaming = () => {
     client.user.setPresence({
         status: 'online',
         activities: [{
@@ -22,67 +14,56 @@ const setOnlyStreaming = () => {
             type: "STREAMING",
             url: "https://www.twitch.tv/twitch",
             applicationId: APP_ID,
-            assets: {
-                largeImage: "mp:external/1344473859664539668/https/i.imgur.com/83pZpGZ.png",
-                largeText: "Eyad's Stream"
-            },
+            assets: { largeImage: "stream_logo", largeText: "Eyad's Stream" },
             buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
         }]
     });
 };
 
-async function connectToVoice() {
-    const guild = await client.guilds.fetch('701688616614625360').catch(() => null);
-    if (guild) {
-        try {
-            joinVoiceChannel({
-                channelId: '1414687975974895636',
-                guildId: '701688616614625360',
-                adapterCreator: guild.voiceAdapterCreator,
-            });
-        } catch (error) { console.error("Voice Error:", error); }
-    }
-}
+// --- نظام الأوامر (Slash-like) ---
+client.on('messageCreate', async (message) => {
+    if (message.author.id !== client.user.id) return; // البوت يستجيب لك فقط
 
-client.on('ready', async () => {
-    console.log(`تم التشغيل كـ: ${client.user.tag}`);
-    await connectToVoice();
-    
-    // تشغيل الستريم فوراً وتكراره كل 10 دقائق للتأكيد
-    setOnlyStreaming();
-    setInterval(setOnlyStreaming, 600000);
+    const args = message.content.slice(1).split(' ');
+    const command = args.shift().toLowerCase();
+
+    // /room <guildId> <channelId>
+    if (command === 'room') {
+        const [guildId, channelId] = args;
+        const guild = await client.guilds.fetch(guildId).catch(() => null);
+        if (guild) {
+            joinVoiceChannel({ channelId, guildId, adapterCreator: guild.voiceAdapterCreator });
+            message.reply(`✅ تم الاتصال بالروم: ${channelId}`);
+        } else message.reply("❌ تعذر العثور على السيرفر.");
+    }
+
+    // /restart
+    if (command === 'restart') {
+        message.reply("🔄 إعادة تشغيل البوت...");
+        process.exit(); // سيعيد تشغيله تلقائياً إذا كنت تستخدم PM2
+    }
+
+    // /stream
+    if (command === 'stream') {
+        setStreaming();
+        message.reply("📺 تم تفعيل الستريم.");
+    }
 });
 
-// نظام السبام
-setInterval(async () => {
-    if (isPaused) return;
-    const channel = await client.channels.fetch('1117424312006230057').catch(() => null);
-    if (channel) {
-        await channel.send(messages[Math.floor(Math.random() * messages.length)]).catch(() => {});
-    }
-}, 600000);
+client.on('ready', () => {
+    console.log(`تم التشغيل كـ: ${client.user.tag}`);
+    setStreaming();
+});
 
-// نظام الأوتو كويست
+// --- الأوتو كويست ---
 client.on('messageCreate', async (message) => {
-    if (message.author.system && message.components.length > 0 && !isPaused) {
+    if (message.author.system && message.components.length > 0) {
         const button = message.components[0].components.find(c => c.type === 2);
         if (button && message.content.toLowerCase().includes('quest')) {
             const appId = button.url ? new URL(button.url).searchParams.get('application_id') : "0";
             await message.clickButton(button.customId).catch(() => {});
-            spoofQuestProgress(message.id, appId, message.embeds[0]?.title || "مهمة");
         }
     }
 });
-
-async function spoofQuestProgress(questId, appId, name) {
-    for (let i = 0; i < 45; i++) {
-        if (isPaused) break;
-        try {
-            await client.rest.post(`/quests/${questId}/heartbeat`, { body: { application_id: appId, terminal: false }});
-            await new Promise(r => setTimeout(r, 20000));
-        } catch (e) { break; }
-    }
-    await client.rest.post(`/quests/${questId}/heartbeat`, { body: { application_id: appId, terminal: true }});
-}
 
 client.login(process.env.TOKEN);
