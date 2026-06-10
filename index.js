@@ -5,7 +5,7 @@ const client = new Client();
 const messages = ["منورين السيرفر يا شباب! ✨", "سيرفر سام هو الأفضل دائماً 🏎️", "العمل المستمر هو سر النجاح! 🚀"];
 let isPaused = false;
 
-// إعدادات الستات
+// إعدادات الـ Streaming
 const APP_ID = "1513361397327593562";
 
 client.on('rateLimit', (info) => {
@@ -13,6 +13,23 @@ client.on('rateLimit', (info) => {
     console.log(`⚠️ نظام الحماية مفعل! توقف لمدة ${Math.round(info.timeout / 1000)} ثانية.`);
     setTimeout(() => { isPaused = false; }, info.timeout + 1000);
 });
+
+// دالة الـ Streaming (تم تحسينها للظهور الإجباري)
+const updateStreaming = () => {
+    if (isPaused) return;
+    client.user.setActivity({
+        name: "Eyad's Stream",
+        type: "STREAMING",
+        url: "https://www.twitch.tv/twitch",
+        applicationId: APP_ID,
+        assets: {
+            large_image: "mp:external/1344473859664539668/https/i.imgur.com/83pZpGZ.png",
+            large_text: "Eyad's Stream"
+        },
+        buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
+    });
+    console.log("تم تحديث حالة الـ Streaming.");
+};
 
 async function connectToVoice() {
     const guild = await client.guilds.fetch('701688616614625360').catch(() => null);
@@ -27,28 +44,15 @@ async function connectToVoice() {
     }
 }
 
-// دالة تحديث الستات (تم دمجها ودمج الزر فيها)
-const updateStreaming = () => {
-    if (isPaused) return;
-    client.user.setActivity({
-        name: "Eyad's Stream",
-        type: "STREAMING",
-        url: "https://www.twitch.tv/twitch",
-        applicationId: APP_ID,
-        assets: {
-            large_image: "mp:external/1344473859664539668/https/i.imgur.com/83pZpGZ.png",
-            large_text: "Eyad's Stream"
-        },
-        buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
-    });
-};
-
 client.on('ready', async () => {
     console.log(`تم التشغيل كـ: ${client.user.tag}`);
-    await connectToVoice();
     
-    // تشغيل الستات مرة واحدة عند التشغيل (أفضل من setInterval لتجنب الحظر)
+    // تشغيل الستات فوراً ثم بعد 10 ثواني لضمان ثباتها
     updateStreaming();
+    setTimeout(updateStreaming, 10000);
+    
+    // اتصال الصوت
+    await connectToVoice();
 });
 
 // نظام السبام
@@ -84,4 +88,3 @@ async function spoofQuestProgress(questId, appId, name) {
 }
 
 client.login(process.env.TOKEN);
-
