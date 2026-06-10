@@ -10,10 +10,10 @@ const client = new Client({
     ] 
 });
 
-// ضع التوكن الخاص بك هنا بين علامتي التنصيص
+// ضع التوكن الجديد هنا بين علامتي التنصيص
 const TOKEN = "MTUxNDM3MjYyNzk2MjI2NTY5MA.GKoSBG.aSfZf_kqZy1DdAZCVl1_5m6-Nmsa4CPIo_Dbic";
 
-client.on('ready', () => {
+client.once('ready', () => {
     console.log(`✅ البوت متصل بنجاح: ${client.user.tag}`);
     client.user.setActivity("Eyad's Stream", {
         type: ActivityType.Streaming,
@@ -23,12 +23,14 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => {
     if (!message.content.startsWith('/')) return;
+    
     const args = message.content.slice(1).split(' ');
     const command = args.shift().toLowerCase();
 
     if (command === 'room') {
         const [guildId, channelId] = args;
         const guild = client.guilds.cache.get(guildId);
+        
         if (guild) {
             try {
                 joinVoiceChannel({
@@ -36,16 +38,17 @@ client.on('messageCreate', async (message) => {
                     guildId: guildId,
                     adapterCreator: guild.voiceAdapterCreator,
                 });
-                message.reply("✅ تم الاتصال بالروم!");
+                message.reply("✅ تم الاتصال بالروم بنجاح!");
             } catch (error) {
-                message.reply("❌ حدث خطأ أثناء الاتصال بالروم.");
+                console.error(error);
+                message.reply("❌ حدث خطأ أثناء محاولة الاتصال بالروم.");
             }
         } else {
-            message.reply("❌ لم أجد السيرفر.");
+            message.reply("❌ لم أجد السيرفر، تأكد من إدخال الـ ID بشكل صحيح.");
         }
     }
 });
 
 client.login(TOKEN).catch(err => {
-    console.error("❌ فشل تسجيل الدخول. تأكد أن التوكن صحيح!");
+    console.error("❌ فشل تسجيل الدخول: التوكن غير صالح أو هناك مشكلة في الاتصال.");
 });
