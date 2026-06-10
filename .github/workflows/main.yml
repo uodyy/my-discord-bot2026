@@ -19,7 +19,8 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install discord.js-selfbot-v13@latest @discordjs/voice sodium-native
+        run: |
+          npm install discord.js-selfbot-v13@latest @discordjs/voice sodium-native
 
       - name: Run bot
         env:
