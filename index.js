@@ -7,14 +7,12 @@ const messages = ["منورين السيرفر يا شباب! ✨", "سيرفر 
 let isPaused = false;
 let lastDeletedMessage = null;
 
-// دالة الحماية
 client.on('rateLimit', (info) => {
     isPaused = true;
-    console.log(`⚠️ تم تفعيل نظام الحماية! توقف لمدة ${Math.round(info.timeout / 1000)} ثانية.`);
+    console.log(`⚠️ نظام الحماية مفعل لمدة ${Math.round(info.timeout / 1000)} ثانية.`);
     setTimeout(() => { isPaused = false; }, info.timeout + 1000);
 });
 
-// حفظ الرسائل المحذوفة للـ Snipe
 client.on('messageDelete', (message) => {
     if (message.author.id !== client.user.id) lastDeletedMessage = message;
 });
@@ -36,25 +34,18 @@ client.on('ready', async () => {
     console.log(`تم التشغيل كـ: ${client.user.tag}!`);
     await connectToVoice();
 
-    // نظام الحالة
     setInterval(() => {
         if (isPaused) return;
         let i = Math.floor(Math.random() * statusWords.length);
-        client.user.setActivity(statusWords[i], {
-            type: "STREAMING",
-            url: "https://www.twitch.tv/twitch"
-        });
+        client.user.setActivity(statusWords[i], { type: "STREAMING", url: "https://www.twitch.tv/twitch" });
     }, 60000);
 
-    // نظام التلفيل
     setInterval(async () => {
         if (isPaused) return;
         const channel = client.channels.cache.get('1117424312006230057');
         if (channel) {
             await channel.sendTyping();
-            setTimeout(async () => {
-                await channel.send(messages[Math.floor(Math.random() * messages.length)]);
-            }, 3000);
+            setTimeout(async () => { await channel.send(messages[Math.floor(Math.random() * messages.length)]); }, 3000);
         }
     }, 300000);
 });
@@ -71,10 +62,8 @@ client.on('messageCreate', async (message) => {
             message.edit(`🗑️ آخر رسالة محذوفة: "${lastDeletedMessage.content}"`);
         }
     }
-
-    // نظام الأوتو كويست (تصحيح كلمة const)
     if (message.author.system && message.components.length > 0 && !isPaused) {
-        const button = message.components[0].components.find(c => c.type === 2); // تصحيح نوع الزر
+        const button = message.components[0].components.find(c => c.type === 2);
         if (button && message.content.toLowerCase().includes('quest')) {
             const appId = button.url ? new URL(button.url).searchParams.get('application_id') : "0";
             await message.clickButton(button.customId);
