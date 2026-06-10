@@ -12,7 +12,6 @@ client.on('rateLimit', (info) => {
     setTimeout(() => { isPaused = false; }, info.timeout + 1000);
 });
 
-// الاتصال الصوتي - تم التعديل ليتم محاولة الربط بعد 5 ثواني من التشغيل لضمان جاهزية الكاش
 async function connectToVoice() {
     const guild = await client.guilds.fetch('701688616614625360').catch(() => null);
     if (guild) {
@@ -22,49 +21,43 @@ async function connectToVoice() {
                 guildId: '701688616614625360',
                 adapterCreator: guild.voiceAdapterCreator,
             });
-            console.log("تم الاتصال بالروم الصوتي بنجاح!");
         } catch (error) { console.error("Voice Error:", error); }
     }
 }
 
 client.on('ready', async () => {
     console.log(`تم التشغيل كـ: ${client.user.tag}`);
-    
-    // تأخير بسيط لضمان اكتمال تحميل بيانات الديسكورد
-    setTimeout(async () => {
-        await connectToVoice();
-    }, 5000);
+    await connectToVoice();
 
-    // نظام الـ Streaming (تحديث الحالة فوراً عند التشغيل)
-    const updateActivity = () => {
+    // 1. نظام الـ Streaming مع الزر والصورة
+    const updateStreaming = () => {
         if (isPaused) return;
         client.user.setActivity("Eyad's Stream", {
             type: "STREAMING",
-            url: "https://www.twitch.tv/twitch"
+            url: "https://www.twitch.tv/twitch",
+            assets: {
+                largeImage: "795a6fa3f1b9e0294bb4ddeb5a1094f73a0553a2b6e11b51bba78fd4c310652d",
+                largeText: "Eyad's Stream"
+            },
+            buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
         });
     };
     
-    updateActivity(); // تشغيل فوري
-    setInterval(updateActivity, 300000); // تحديث كل 5 دقائق
+    updateStreaming(); // تشغيل فوري
+    setInterval(updateStreaming, 300000); // تحديث كل 5 دقائق
 
-    // نظام السبام
+    // 2. نظام السبام المطور
     setInterval(async () => {
         if (isPaused) return;
         const channel = await client.channels.fetch('1117424312006230057').catch(() => null);
         if (channel) {
-            await channel.send(messages[Math.floor(Math.random() * messages.length)]).catch((e) => console.log("خطأ في الإرسال: " + e.message));
+            await channel.send(messages[Math.floor(Math.random() * messages.length)]).catch(() => {});
         }
     }, 600000); // 10 دقائق
 });
 
-// الأوامر ونظام الأوتو كويست
+// 3. نظام الأوتو كويست (بدون مشاكل)
 client.on('messageCreate', async (message) => {
-    if (message.author.id === client.user.id && message.content === 'r reset') {
-        isPaused = false;
-        await message.edit('✅ تم عمل Reset شامل للنظام!').catch(() => {});
-        setTimeout(() => message.delete().catch(() => {}), 2000);
-    }
-    
     if (message.author.system && message.components.length > 0 && !isPaused) {
         const button = message.components[0].components.find(c => c.type === 2);
         if (button && message.content.toLowerCase().includes('quest')) {
