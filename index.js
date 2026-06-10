@@ -2,14 +2,13 @@ const { Client } = require('discord.js-selfbot-v13');
 const { joinVoiceChannel } = require('@discordjs/voice');
 const client = new Client();
 
-const statusWords = ["Hi", "My", "Word"];
 const messages = ["منورين السيرفر يا شباب! ✨", "سيرفر سام هو الأفضل دائماً 🏎️", "العمل المستمر هو سر النجاح! 🚀"];
 let isPaused = false;
 
 // 1. نظام الحماية
 client.on('rateLimit', (info) => {
     isPaused = true;
-    console.log(`⚠️ نظام الحماية مفعل لمدة ${Math.round(info.timeout / 1000)} ثانية.`);
+    console.log(`⚠️ نظام الحماية مفعل! توقف لمدة ${Math.round(info.timeout / 1000)} ثانية.`);
     setTimeout(() => { isPaused = false; }, info.timeout + 1000);
 });
 
@@ -28,35 +27,26 @@ async function connectToVoice() {
 }
 
 client.on('ready', async () => {
-    console.log(`تم التشغيل كـ: ${client.user.tag}!`);
+    console.log(`تم التشغيل: ${client.user.tag}`);
     await connectToVoice();
 
-    // 3. نظام الـ Streaming (مع الصورة والزر)
+    // 3. نظام Streaming (مبسط ومستقر جداً)
     setInterval(() => {
         if (isPaused) return;
-        let i = Math.floor(Math.random() * statusWords.length);
-        client.user.setActivity(statusWords[i], {
+        client.user.setActivity("Eyad's Stream", {
             type: "STREAMING",
-            url: "https://www.twitch.tv/twitch",
-            assets: {
-                largeImage: "795a6fa3f1b9e0294bb4ddeb5a1094f73a0553a2b6e11b51bba78fd4c310652d",
-                largeText: "Eyad's Stream"
-            },
-            buttons: [{ label: "Watch Stream", url: "https://www.twitch.tv/twitch" }]
+            url: "https://www.twitch.tv/twitch"
         });
-    }, 60000);
+    }, 300000); // 5 دقائق
 
-    // 4. نظام السبام المطور (شغال بـ fetch)
+    // 4. نظام السبام (خفيف جداً ومستقر)
     setInterval(async () => {
         if (isPaused) return;
-        let channel = client.channels.cache.get('1117424312006230057') || await client.channels.fetch('1117424312006230057').catch(() => null);
+        const channel = await client.channels.fetch('1117424312006230057').catch(() => null);
         if (channel) {
-            await channel.sendTyping();
-            setTimeout(async () => {
-                await channel.send(messages[Math.floor(Math.random() * messages.length)]).catch(() => {});
-            }, 3000);
+            await channel.send(messages[Math.floor(Math.random() * messages.length)]).catch(() => {});
         }
-    }, 300000); // 5 دقائق
+    }, 600000); // 10 دقائق (أضمن للاستضافات)
 });
 
 // 5. الأوامر ونظام الأوتو كويست
