@@ -1,6 +1,9 @@
+// 1. استيراد المكتبات الأساسية
+require('dotenv').config(); // لقراءة التوكن من ملف .env
 const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
 
+// 2. إعداد الصلاحيات (Intents)
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds, 
@@ -10,19 +13,18 @@ const client = new Client({
     ] 
 });
 
-// ضع هنا التوكن الجديد الذي حصلت عليه بعد الـ Reset
-const TOKEN = "MTUxNDM3MjYyNzk2MjI2NTY5MA.GzV-Qp.EFk4juPsIDD9zLSNkw9--GfJLNetuHBEZLIthA"; 
-
+// 3. عند تشغيل البوت
 client.on('ready', () => {
     console.log(`✅ البوت جاهز ويعمل باسم: ${client.user.tag}`);
     
-    // تعيين حالة الستريم (تظهر للبوتات كـ Streaming)
+    // تعيين حالة الستريم
     client.user.setActivity("Eyad's Stream", {
         type: ActivityType.Streaming,
         url: "https://www.twitch.tv/twitch"
     });
 });
 
+// 4. نظام الأوامر
 client.on('messageCreate', async (message) => {
     if (!message.content.startsWith('/')) return;
     
@@ -33,6 +35,7 @@ client.on('messageCreate', async (message) => {
     if (command === 'room') {
         const [guildId, channelId] = args;
         const guild = client.guilds.cache.get(guildId);
+        
         if (guild) {
             try {
                 joinVoiceChannel({
@@ -42,7 +45,8 @@ client.on('messageCreate', async (message) => {
                 });
                 message.reply("✅ تم الاتصال بالروم بنجاح!");
             } catch (error) {
-                message.reply("❌ حدث خطأ أثناء الاتصال بالروم.");
+                console.error(error);
+                message.reply("❌ حدث خطأ أثناء الاتصال بالروم، تأكد من الصلاحيات.");
             }
         } else {
             message.reply("❌ لم أجد السيرفر، تأكد من الـ ID.");
@@ -56,4 +60,5 @@ client.on('messageCreate', async (message) => {
     }
 });
 
-client.login(TOKEN);
+// 5. تسجيل الدخول باستخدام التوكن من ملف .env
+client.login(process.env.TOKEN);
