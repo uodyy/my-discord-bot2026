@@ -1,54 +1,26 @@
-const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
+const { Client } = require('discord.js-selfbot-v13');
 const { joinVoiceChannel } = require('@discordjs/voice');
+const client = new Client();
 
-const client = new Client({ 
-    intents: [
-        GatewayIntentBits.Guilds, 
-        GatewayIntentBits.GuildMessages, 
-        GatewayIntentBits.MessageContent, 
-        GatewayIntentBits.GuildVoiceStates
-    ] 
-});
+client.on('ready', async () => {
+  console.log(`تم تسجيل الدخول بنجاح باسم: ${client.user.tag}`);
 
-// ضع التوكن الجديد هنا بين علامتي التنصيص
-const TOKEN = "MTUxNDM3MjYyNzk2MjI2NTY5MA.GKoSBG.aSfZf_kqZy1DdAZCVl1_5m6-Nmsa4CPIo_Dbic";
+  // هنا تضع ID الروم الصوتي الذي تريد البوت أن يدخله
+  const channelId = '1414687975974895636';
+  const guildId = '701688616614625360';
 
-client.once('ready', () => {
-    console.log(`✅ البوت متصل بنجاح: ${client.user.tag}`);
-    client.user.setActivity("Eyad's Stream", {
-        type: ActivityType.Streaming,
-        url: "https://www.twitch.tv/twitch"
+  const channel = client.channels.cache.get(channelId);
+  if (channel) {
+    joinVoiceChannel({
+      channelId: channel.id,
+      guildId: channel.guild.id,
+      adapterCreator: channel.guild.voiceAdapterCreator,
+      selfDeaf: false, // اجعله false ليكون الصوت غير مكتوم
+      selfMute: false  // اجعله false ليتمكن البوت من الكلام إذا أردت
     });
+    console.log("تم الانضمام للروم بنجاح");
+  }
 });
 
-client.on('messageCreate', async (message) => {
-    if (!message.content.startsWith('/')) return;
-    
-    const args = message.content.slice(1).split(' ');
-    const command = args.shift().toLowerCase();
-
-    if (command === 'room') {
-        const [guildId, channelId] = args;
-        const guild = client.guilds.cache.get(guildId);
-        
-        if (guild) {
-            try {
-                joinVoiceChannel({
-                    channelId: channelId,
-                    guildId: guildId,
-                    adapterCreator: guild.voiceAdapterCreator,
-                });
-                message.reply("✅ تم الاتصال بالروم بنجاح!");
-            } catch (error) {
-                console.error(error);
-                message.reply("❌ حدث خطأ أثناء محاولة الاتصال بالروم.");
-            }
-        } else {
-            message.reply("❌ لم أجد السيرفر، تأكد من إدخال الـ ID بشكل صحيح.");
-        }
-    }
-});
-
-client.login(TOKEN).catch(err => {
-    console.error("❌ فشل تسجيل الدخول: التوكن غير صالح أو هناك مشكلة في الاتصال.");
-});
+// ضع التوكن هنا أو استخدم المتغيرات في Railway
+client.login('OTM1NjM0MDE5NTg3MDY3OTk1.G7mdTW.Yf0qT3ZB5Yj4OBUbG6qx_WzVAl50-CaKAtiVI8');
