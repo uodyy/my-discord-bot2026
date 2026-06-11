@@ -1,15 +1,8 @@
 {
-  "name": "my-discord-bot2026",
+  "name": "my-custom-bot",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
   "dependencies": {
-    "discord.js-selfbot-v13": "^3.5.0",
-    "@discordjs/voice": "^0.17.0",
-    "@discordjs/opus": "^0.10.0",
-    "sodium-native": "^4.0.0",
-    "dotenv": "^16.4.5"
+    "discord.js-selfbot-v13": "^3.5.1"
   }
 }
