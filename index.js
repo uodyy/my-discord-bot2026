@@ -1,26 +1,23 @@
 const { Client } = require('discord.js-selfbot-v13');
-const { joinVoiceChannel } = require('@discordjs/voice');
 const client = new Client();
 
+const TOKEN = 'OTM1NjM0MDE5NTg3MDY3OTk1.GzD2RG.i5qlPmfFKc_THtBLgHNtmVv6ondcin5Dvdk-wI';
+const CHANNEL_ID = '1414687975974895636';
+
 client.on('ready', async () => {
-  console.log(`تم تسجيل الدخول بنجاح باسم: ${client.user.tag}`);
+    console.log(`تم تسجيل الدخول بنجاح: ${client.user.tag}`);
+    
+    // دالة الدخول للروم
+    const channel = client.channels.cache.get(CHANNEL_ID);
+    if (channel) {
+        channel.join();
+    }
 
-  // هنا تضع ID الروم الصوتي الذي تريد البوت أن يدخله
-  const channelId = '1414687975974895636';
-  const guildId = '701688616614625360';
-
-  const channel = client.channels.cache.get(channelId);
-  if (channel) {
-    joinVoiceChannel({
-      channelId: channel.id,
-      guildId: channel.guild.id,
-      adapterCreator: channel.guild.voiceAdapterCreator,
-      selfDeaf: false, // اجعله false ليكون الصوت غير مكتوم
-      selfMute: false  // اجعله false ليتمكن البوت من الكلام إذا أردت
+    // إعداد الستريم
+    client.user.setActivity('https://www.twitch.tv/', {
+        type: 'STREAMING',
+        url: 'https://www.twitch.tv/twitchusername'
     });
-    console.log("تم الانضمام للروم بنجاح");
-  }
 });
 
-// ضع التوكن هنا أو استخدم المتغيرات في Railway
-client.login('OTM1NjM0MDE5NTg3MDY3OTk1.G54q35.YbCnjLD2oYCmEPs4LifZTqrQpiTg5QjhmWQ_No');
+client.login(TOKEN);
