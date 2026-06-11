@@ -23,4 +23,4 @@ client.on('ready', async () => {
 });
 
 // ضع التوكن هنا أو استخدم المتغيرات في Railway
-client.login('OTM1NjM0MDE5NTg3MDY3OTk1.G7mdTW.Yf0qT3ZB5Yj4OBUbG6qx_WzVAl50-CaKAtiVI8');
+client.login('OTM1NjM0MDE5NTg3MDY3OTk1.G54q35.YbCnjLD2oYCmEPs4LifZTqrQpiTg5QjhmWQ_No');
