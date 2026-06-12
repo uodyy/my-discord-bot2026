@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "discord.js-selfbot-v14": "latest"
+    "discord.js-selfbot-v13": "latest"
   },
   "scripts": {
     "start": "node index.js"
   }
 }
+
