@@ -1,13 +1,11 @@
-const { Client } = require('discord.js-selfbot-v14');
-
-  "name": "my-bot",
+{
+  "name": "bot",
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "discord.js-selfbot-v13": "latest"
+    "discord.js-selfbot-v14": "latest"
   },
   "scripts": {
     "start": "node index.js"
   }
 }
-
