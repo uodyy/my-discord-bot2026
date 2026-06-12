@@ -1,7 +1,7 @@
 const { Client } = require('discord.js-selfbot-v13');
 const client = new Client();
 
-const TOKEN = 'OTM1NjM0MDE5NTg3MDY3OTk1.GzD2RG.i5qlPmfFKc_THtBLgHNtmVv6ondcin5Dvdk-wI';
+const TOKEN = 'OTM1NjM0MDE5NTg3MDY3OTk1.G79lXL.Syn1eHCA1o2DZPKn9PC5Bda_Brp-uWqug9lGgo';
 const CHANNEL_ID = '1414687975974895636';
 
 client.on('ready', async () => {
