@@ -1,23 +1,36 @@
-const { Client } = require('discord.js-selfbot-v13');
-const client = new Client();
+const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
+const { joinVoiceChannel } = require('@discordjs/voice');
 
-const TOKEN = 'OTM1NjM0MDE5NTg3MDY3OTk1.G79lXL.Syn1eHCA1o2DZPKn9PC5Bda_Brp-uWqug9lGgo';
-const CHANNEL_ID = '1414687975974895636';
-
-client.on('ready', async () => {
-    console.log(`تم تسجيل الدخول بنجاح: ${client.user.tag}`);
-    
-    // دالة الدخول للروم
-    const channel = client.channels.cache.get(CHANNEL_ID);
-    if (channel) {
-        channel.join();
-    }
-
-    // إعداد الستريم
-    client.user.setActivity('https://www.twitch.tv/', {
-        type: 'STREAMING',
-        url: 'https://www.twitch.tv/twitchusername'
-    });
+const client = new Client({ 
+    intents: [
+        GatewayIntentBits.Guilds, 
+        GatewayIntentBits.GuildVoiceStates 
+    ] 
 });
 
-client.login(TOKEN);
+client.once('ready', () => {
+    console.log(`تم تسجيل الدخول بنجاح كـ ${client.user.tag}`);
+
+    // إعداد حالة البث
+    client.user.setActivity('مباشر الآن', { 
+        type: ActivityType.Streaming,
+        url: 'https://www.twitch.tv/example' // ضع رابط تويتش حقيقي
+    });
+
+    // الدخول للروم الصوتي باستخدام الأيديات من الموقع
+    const guild = client.guilds.cache.get(process.env.GUILD_ID);
+    const channel = guild?.channels.cache.get(process.env.CHANNEL_ID);
+
+    if (channel) {
+        joinVoiceChannel({
+            channelId: channel.id,
+            guildId: guild.id,
+            adapterCreator: guild.voiceAdapterCreator,
+        });
+        console.log('تم دخول الروم بنجاح!');
+    } else {
+        console.log('لم يتم العثور على الروم، تأكد من الأيديات في Variables');
+    }
+});
+
+client.login(process.env.TOKEN);
