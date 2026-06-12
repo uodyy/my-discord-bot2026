@@ -2,13 +2,10 @@
   "name": "my-bot",
   "version": "1.0.0",
   "main": "index.js",
+  "dependencies": {
+    "discord.js": "^14.14.0"
+  },
   "scripts": {
     "start": "node index.js"
-  },
-  "dependencies": {
-    "discord.js-selfbot-v13": "latest",
-    "debug": "latest",
-    "werift": "latest",
-    "sodium-native": "latest"
   }
 }
